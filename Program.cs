@@ -34,7 +34,7 @@ app.MapGet("/hospitals", () => Results.Ok(hospitals));
 
 app.MapGet("/hospitals/{id}", (int id) =>
 {
-    var hospital = hospital.FirstOrDefault(h.Id == id);
+    var hospital = hospitals.FirstOrDefault(h => h.Id == id);
     return hospital is not null ? Results.Ok(hospital) : Results.NotFound();
 });
 
@@ -44,14 +44,14 @@ app.MapPut("/hospitals/{id}", (int id, Hospital updateHospital) =>
     if (hospital is null) return Results.NotFound();
 
     hospital.Name = updateHospital.Name;
-    hospital.Address = updatedHospital.Address;
+    hospital.Address = updateHospital.Address;
     return Results.Ok(hospital);
 
 });
 
 app.MapDelete("/hospitals/{id}", (int id) =>
 {
-    var hospital = hospital.FirstOrDefault(h => h.Id == id);
+    var hospital = hospitals.FirstOrDefault(h => h.Id == id);
     if (hospital is null) return Results.NotFound();
 
     hospitals.Remove(hospital);
@@ -61,7 +61,7 @@ app.MapDelete("/hospitals/{id}", (int id) =>
 
 app.MapPost("/doctors", (Doctor doctor) => 
 {
-    if (!hospitals.Any(h => h.Id == Doctor.HospitalId))
+    if (!hospitals.Any(h => h.Id == doctor.HospitalId))
         return Results.BadRequest("Hospital Not Found");
 
     doctor.Id = doctorCounter++;
@@ -83,7 +83,7 @@ app.MapPut("/doctors/{id}", (int id, Doctor updatedDoctor) =>
     var doctor = doctors.FirstOrDefault(d => d.Id == id);
     if (doctor is null) return Results.NotFound();
 
-    if(!hospitals.Any(h => h.Id == updatedDoctor.HospiitalId))
+    if(!hospitals.Any(h => h.Id == updatedDoctor.HospitalId))
         return Results.BadRequest("Hospital not found");
 
         doctor.Name = updatedDoctor.Name;
